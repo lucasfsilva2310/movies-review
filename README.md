@@ -12,3 +12,7 @@ It will have the following use cases:
   - Rated
   - Comments about it
 - User can rate movie and make a comment on it.
+
+# How to run API
+
+go to `cmd/server/main.go` and run `go run main.go`
