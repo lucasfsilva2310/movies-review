@@ -1,13 +1,21 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// TODO: add loadConfig from database/sql
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	PORT := os.Getenv("PORT")
 
 	apiConnection := gin.Default()
 
@@ -19,5 +27,5 @@ func main() {
 		})
 	})
 
-	apiConnection.Run("0.0.0.0:8080")
+	apiConnection.Run(":" + PORT)
 }
