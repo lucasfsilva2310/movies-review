@@ -6,7 +6,7 @@ import (
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 )
 
-func ConnectPostgres(config *Configuration.Config) (*sql.DB, error) {
+func ConnectDB(config *Configuration.DatabaseConfig) (*sql.DB, error) {
 	db, err := sql.Open("postgres", config.PostgresURI)
 
 	if err != nil {

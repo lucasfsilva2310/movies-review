@@ -4,10 +4,16 @@ import "os"
 
 type Config struct {
 	PostgresURI string
+	Port        string
 }
 
-func LoadPostgresConfig() *Config {
+type DatabaseConfig struct {
+	PostgresURI string
+}
+
+func LoadEnvConfig() *Config {
 	return &Config{
 		PostgresURI: os.Getenv("POSTGRES_URI"),
+		Port:        os.Getenv("PORT"),
 	}
 }
