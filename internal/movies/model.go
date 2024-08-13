@@ -28,12 +28,12 @@ const (
 )
 
 type Movie struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	ReleaseDate string    `json:"releaseDate"`
-	Tags        []Tags    `json:"tags"`
-	Platforms   []string  `json:"platforms"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          string      `json:"id"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	ReleaseDate string      `json:"releaseDate"`
+	Tags        []Tags      `json:"tags"`
+	Platforms   []Platforms `json:"platforms"`
+	CreatedAt   time.Time   `json:"createdAt"`
+	UpdatedAt   time.Time   `json:"updatedAt"`
 }

@@ -1,0 +1,37 @@
+# If you dont have both containers already created the app wont connect due to application starting before db accept connections
+services:
+  movies_review_postgres_database:
+    image: "postgres:latest"
+    container_name: movies_review_postgres_database
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d # Execute initialization scripts
+    networks:
+      - movies-review-network
+
+  movies_review_api:
+    build: . #Using dockerfile
+    container_name: movies_review_api
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@postgres:5432/mydb?sslmode=disable
+    depends_on:
+      - movies_review_postgres_database
+    volumes:
+      - .:/app
+    networks:
+      - movies-review-network
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
+
+networks:
+  movies-review-network:
+    driver: bridge
