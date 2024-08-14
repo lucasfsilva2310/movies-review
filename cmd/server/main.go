@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,27 +15,32 @@ import (
 
 func main() {
 	// Load Environment Variables
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Fatal(err)
+	if os.Getenv("LOAD_ENV_FILE") == "true" {
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	config := Configuration.LoadEnvConfig()
 
 	PORT := config.Port
-	POSTGRES_URI := config.PostgresURI
+	DATABASE_URL := config.DatabaseUrl
 
 	// Connect to DB
+	log.Println(DATABASE_URL)
 	dbConn, err := db.ConnectDB(&Configuration.DatabaseConfig{
-		PostgresURI: POSTGRES_URI,
+		DatabaseUrl: DATABASE_URL,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer dbConn.Close()
 
 	// Connect to API
 	apiConnection := gin.Default()
-
+	apiConnection.SetTrustedProxies(nil)
 	// Repositories
 
 	// Services

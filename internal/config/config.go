@@ -3,17 +3,17 @@ package Configuration
 import "os"
 
 type Config struct {
-	PostgresURI string
+	DatabaseUrl string
 	Port        string
 }
 
 type DatabaseConfig struct {
-	PostgresURI string
+	DatabaseUrl string
 }
 
 func LoadEnvConfig() *Config {
 	return &Config{
-		PostgresURI: os.Getenv("POSTGRES_URI"),
+		DatabaseUrl: os.Getenv("DATABASE_URL"),
 		Port:        os.Getenv("PORT"),
 	}
 }

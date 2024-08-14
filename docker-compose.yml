@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
+      LOAD_ENV_FILE: false
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +20,10 @@ services:
     build: . #Using dockerfile
     container_name: movies_review_api
     environment:
-      DATABASE_URL: postgres://myuser:mypassword@postgres:5432/mydb?sslmode=disable
+      # Need to use DB service name and port
+      DATABASE_URL: postgres://myuser:mypassword@movies_review_postgres_database:5432/mydb?sslmode=disable
+      PORT: 8000
+      LOAD_ENV_FILE: false
     depends_on:
       - movies_review_postgres_database
     volumes:
