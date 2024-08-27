@@ -10,6 +10,7 @@ import (
 	_ "github.com/lib/pq" // Postgres Driver
 
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+	"github.com/lucasfsilva2310/movies-review/internal/movies"
 	db "github.com/lucasfsilva2310/movies-review/pkg/database"
 )
 
@@ -28,7 +29,6 @@ func main() {
 	DATABASE_URL := config.DatabaseUrl
 
 	// Connect to DB
-	log.Println(DATABASE_URL)
 	dbConn, err := db.ConnectDB(&Configuration.DatabaseConfig{
 		DatabaseUrl: DATABASE_URL,
 	})
@@ -42,15 +42,47 @@ func main() {
 	apiConnection := gin.Default()
 	apiConnection.SetTrustedProxies(nil)
 	// Repositories
+	movieRepo := movies.NewRepository(dbConn)
 
 	// Services
+	movieService := movies.NewService(movieRepo)
 
 	// Endpoints
+
+	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "Hello World",
 		})
 	})
 
+	// Movies
+	apiConnection.GET("/movies", func(ctx *gin.Context) {
+		movies, err := movieService.GetAll()
+
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, movies)
+	})
+
+	apiConnection.GET("/movies/:id", func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		movie, err := movieService.GetByID(id)
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, movie)
+	})
+
+	// Start API
 	apiConnection.Run(":" + PORT)
 }

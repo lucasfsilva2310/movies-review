@@ -1,6 +1,8 @@
 package movies
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Repository struct {
 	db *sql.DB
@@ -32,4 +34,28 @@ func (repo *Repository) GetAll() ([]Movie, error) {
 	}
 
 	return movies, nil
+}
+
+func (repo *Repository) GetByID(id string) (Movie, error) {
+	var movie Movie
+
+	err := repo.db.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(
+		&movie.ID,
+		&movie.Title,
+		&movie.Description,
+		&movie.ReleaseDate,
+		&movie.Tags,
+		&movie.Platforms,
+		&movie.CreatedAt,
+		&movie.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Movie{}, nil
+		}
+		return Movie{}, err
+	}
+
+	return movie, nil
 }

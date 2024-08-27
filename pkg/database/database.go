@@ -8,7 +8,7 @@ import (
 )
 
 func ConnectDB(config *Configuration.DatabaseConfig) (*sql.DB, error) {
-	log.Println("Connecting to DB..")
+	log.Println("Connecting to Database..")
 
 	dbConnection, err := sql.Open("postgres", config.DatabaseUrl)
 
@@ -19,7 +19,7 @@ func ConnectDB(config *Configuration.DatabaseConfig) (*sql.DB, error) {
 	if err := dbConnection.Ping(); err != nil {
 		return nil, err
 	}
-	log.Println("Connected to DB.")
+	log.Println("Connected successfully!")
 
 	return dbConnection, nil
 }
