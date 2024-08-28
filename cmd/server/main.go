@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -77,6 +78,26 @@ func main() {
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, movie)
+	})
+
+	apiConnection.POST("/movies", func(ctx *gin.Context) {
+		var movie movies.Movie
+
+		fmt.Println((ctx.Request.Body))
+
+		if err := ctx.ShouldBindJSON(&movie); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"errorBind": err.Error()})
+			return
+		}
+
+		movie, err := movieService.CreateMovie(movie)
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"errorCreating": err.Error()})
 			return
 		}
 
