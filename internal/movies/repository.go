@@ -2,8 +2,7 @@ package movies
 
 import (
 	"database/sql"
-
-	"github.com/lib/pq"
+	"encoding/json"
 )
 
 type Repository struct {
@@ -26,10 +25,20 @@ func (repo *Repository) GetAll() ([]Movie, error) {
 	defer rows.Close()
 
 	var movies []Movie
+	var tagsJSON, platformsJSON []byte
 
 	for rows.Next() {
+
 		var movie Movie
-		if err := rows.Scan(&movie.ID, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.Tags, &movie.Platforms, &movie.CreatedAt, &movie.UpdatedAt); err != nil {
+		if err := rows.Scan(&movie.ID, &movie.Title, &movie.Description, &movie.ReleaseDate, &tagsJSON, &platformsJSON, &movie.CreatedAt, &movie.UpdatedAt); err != nil {
+			return nil, err
+		}
+
+		if err := json.Unmarshal(tagsJSON, &movie.Tags); err != nil {
+			return nil, err
+		}
+
+		if err := json.Unmarshal(platformsJSON, &movie.Platforms); err != nil {
 			return nil, err
 		}
 		movies = append(movies, movie)
@@ -63,11 +72,21 @@ func (repo *Repository) GetByID(id string) (Movie, error) {
 }
 
 func (repo *Repository) CreateMovie(movie Movie) (Movie, error) {
-	_, err := repo.db.Exec(`
+	tagsJSON, err := json.Marshal(movie.Tags)
+	if err != nil {
+		return Movie{}, err
+	}
+
+	platformsJSON, err := json.Marshal(movie.Platforms)
+	if err != nil {
+		return Movie{}, err
+	}
+
+	_, err = repo.db.Exec(`
 		INSERT INTO movies
 	(title, description, release_date, tags, platforms, created_at, updated_at)
 	  	VALUES 
-	($1, $2, $3, $4, $5, $6, $7)`, movie.Title, movie.Description, movie.ReleaseDate, pq.Array(movie.Tags), pq.Array(movie.Platforms), movie.CreatedAt, movie.UpdatedAt)
+	($1, $2, $3, $4, $5, $6, $7)`, movie.Title, movie.Description, movie.ReleaseDate, tagsJSON, platformsJSON, movie.CreatedAt, movie.UpdatedAt)
 
 	if err != nil {
 		return Movie{}, err
