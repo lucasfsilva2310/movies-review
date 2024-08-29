@@ -9,6 +9,12 @@ type Repository struct {
 	db *sql.DB
 }
 
+type AlreadyExistsError struct{}
+
+func (alreadyExistsError *AlreadyExistsError) Error() string {
+	return "Movie Already Exists."
+}
+
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		db: db,
@@ -71,15 +77,27 @@ func (repo *Repository) GetByID(id string) (Movie, error) {
 	return movie, nil
 }
 
-func (repo *Repository) CreateMovie(movie Movie) (Movie, error) {
+func (repo *Repository) Create(movie Movie) error {
+	var existingMovie Movie
+
+	err := repo.db.QueryRow("SELECT id FROM movies WHERE LOWER(title) = LOWER($1)", movie.Title).Scan(&existingMovie.ID)
+
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	if existingMovie.ID != "" {
+		return &AlreadyExistsError{}
+	}
+
 	tagsJSON, err := json.Marshal(movie.Tags)
 	if err != nil {
-		return Movie{}, err
+		return err
 	}
 
 	platformsJSON, err := json.Marshal(movie.Platforms)
 	if err != nil {
-		return Movie{}, err
+		return err
 	}
 
 	_, err = repo.db.Exec(`
@@ -89,8 +107,16 @@ func (repo *Repository) CreateMovie(movie Movie) (Movie, error) {
 	($1, $2, $3, $4, $5, $6, $7)`, movie.Title, movie.Description, movie.ReleaseDate, tagsJSON, platformsJSON, movie.CreatedAt, movie.UpdatedAt)
 
 	if err != nil {
-		return Movie{}, err
+		return err
 	}
 
-	return movie, nil
+	return nil
+}
+
+func (repo *Repository) Delete(id string) error {
+	_, err := repo.db.Exec("DELETE FROM movies WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

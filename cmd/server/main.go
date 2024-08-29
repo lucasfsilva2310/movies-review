@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -87,21 +86,32 @@ func main() {
 	apiConnection.POST("/movies", func(ctx *gin.Context) {
 		var movie movies.Movie
 
-		fmt.Println((ctx.Request.Body))
-
 		if err := ctx.ShouldBindJSON(&movie); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"errorBind": err.Error()})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		movie, err := movieService.CreateMovie(movie)
+		err := movieService.Create(movie)
 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"errorCreating": err.Error()})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
 		ctx.JSON(http.StatusOK, movie)
+	})
+
+	apiConnection.DELETE("movies/:id", func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		err := movieService.Delete(id)
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"message": "Movie deleted successfully"})
 	})
 
 	// Start API
