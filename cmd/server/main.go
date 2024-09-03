@@ -41,6 +41,8 @@ func main() {
 	// Connect to API
 	apiConnection := gin.Default()
 	apiConnection.SetTrustedProxies(nil)
+
+	// TODO: Create Func to register repo and service inside of it
 	// Repositories
 	movieRepo := movies.NewRepository(dbConn)
 
@@ -48,6 +50,7 @@ func main() {
 	movieService := movies.NewService(movieRepo)
 
 	// Endpoints
+	movies.RegisterRoutes(apiConnection, movieService)
 
 	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {
@@ -57,62 +60,6 @@ func main() {
 	})
 
 	// Movies
-	apiConnection.GET("/movies", func(ctx *gin.Context) {
-		movies, err := movieService.GetAll()
-
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, movies)
-	})
-
-	apiConnection.GET("/movies/:id", func(ctx *gin.Context) {
-		id := ctx.Param("id")
-
-		movie, err := movieService.GetByID(id)
-
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, movie)
-	})
-
-	apiConnection.POST("/movies", func(ctx *gin.Context) {
-		var movie movies.Movie
-
-		if err := ctx.ShouldBindJSON(&movie); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		err := movieService.Create(movie)
-
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, movie)
-	})
-
-	apiConnection.DELETE("movies/:id", func(ctx *gin.Context) {
-		id := ctx.Param("id")
-
-		err := movieService.Delete(id)
-
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{"message": "Movie deleted successfully"})
-	})
 
 	// Start API
 	apiConnection.Run(":" + PORT)

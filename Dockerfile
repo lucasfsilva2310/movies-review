@@ -7,6 +7,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+# COPY CONTENT FROM air.toml to start server using it
 COPY .air.toml .
 
 RUN go install github.com/air-verse/air@latest

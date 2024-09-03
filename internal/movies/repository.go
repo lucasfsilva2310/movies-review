@@ -22,6 +22,8 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 func (repo *Repository) GetAll() ([]Movie, error) {
+	var movies []Movie
+
 	rows, err := repo.db.Query("SELECT * FROM movies")
 
 	if err != nil {
@@ -30,11 +32,13 @@ func (repo *Repository) GetAll() ([]Movie, error) {
 
 	defer rows.Close()
 
-	var movies []Movie
 	var tagsJSON, platformsJSON []byte
 
-	for rows.Next() {
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
 
+	for rows.Next() {
 		var movie Movie
 		if err := rows.Scan(&movie.ID, &movie.Title, &movie.Description, &movie.ReleaseDate, &tagsJSON, &platformsJSON, &movie.CreatedAt, &movie.UpdatedAt); err != nil {
 			return nil, err
