@@ -3,10 +3,18 @@ package movies
 import (
 	"database/sql"
 	"encoding/json"
+
+	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 )
 
-type Repository struct {
-	db *sql.DB
+type MovieRepository struct {
+	Repo *Configuration.Repository
+}
+
+func NewMovieRepository(repo *Configuration.Repository) *MovieRepository {
+	return &MovieRepository{
+		Repo: repo,
+	}
 }
 
 type AlreadyExistsError struct{}
@@ -15,16 +23,10 @@ func (alreadyExistsError *AlreadyExistsError) Error() string {
 	return "Movie Already Exists."
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{
-		db: db,
-	}
-}
-
-func (repo *Repository) GetAll() ([]Movie, error) {
+func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
 	var movies []Movie
 
-	rows, err := repo.db.Query("SELECT * FROM movies")
+	rows, err := movieRepo.Repo.DB.Query("SELECT * FROM movies")
 
 	if err != nil {
 		return nil, err
@@ -57,10 +59,10 @@ func (repo *Repository) GetAll() ([]Movie, error) {
 	return movies, nil
 }
 
-func (repo *Repository) GetByID(id string) (Movie, error) {
+func (movieRepo *MovieRepository) GetByID(id string) (Movie, error) {
 	var movie Movie
 
-	err := repo.db.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(
+	err := movieRepo.Repo.DB.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(
 		&movie.ID,
 		&movie.Title,
 		&movie.Description,
@@ -81,10 +83,10 @@ func (repo *Repository) GetByID(id string) (Movie, error) {
 	return movie, nil
 }
 
-func (repo *Repository) Create(movie Movie) error {
+func (movieRepo *MovieRepository) Create(movie Movie) error {
 	var existingMovie Movie
 
-	err := repo.db.QueryRow("SELECT id FROM movies WHERE LOWER(title) = LOWER($1)", movie.Title).Scan(&existingMovie.ID)
+	err := movieRepo.Repo.DB.QueryRow("SELECT id FROM movies WHERE LOWER(title) = LOWER($1)", movie.Title).Scan(&existingMovie.ID)
 
 	if err != nil && err != sql.ErrNoRows {
 		return err
@@ -104,7 +106,7 @@ func (repo *Repository) Create(movie Movie) error {
 		return err
 	}
 
-	_, err = repo.db.Exec(`
+	_, err = movieRepo.Repo.DB.Exec(`
 		INSERT INTO movies
 	(title, description, release_date, tags, platforms, created_at, updated_at)
 	  	VALUES 
@@ -117,8 +119,8 @@ func (repo *Repository) Create(movie Movie) error {
 	return nil
 }
 
-func (repo *Repository) Delete(id string) error {
-	_, err := repo.db.Exec("DELETE FROM movies WHERE id = $1", id)
+func (movieRepo *MovieRepository) Delete(id string) error {
+	_, err := movieRepo.Repo.DB.Exec("DELETE FROM movies WHERE id = $1", id)
 	if err != nil {
 		return err
 	}

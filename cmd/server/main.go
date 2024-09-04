@@ -11,6 +11,7 @@ import (
 
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
+	"github.com/lucasfsilva2310/movies-review/internal/users"
 	db "github.com/lucasfsilva2310/movies-review/pkg/database"
 )
 
@@ -39,18 +40,19 @@ func main() {
 	defer dbConn.Close()
 
 	// Connect to API
-	apiConnection := gin.Default()
-	apiConnection.SetTrustedProxies(nil)
+	apiConnection := Configuration.CreateApiConnection()
 
-	// TODO: Create Func to register repo and service inside of it
 	// Repositories
-	movieRepo := movies.NewRepository(dbConn)
+	movieRepo := movies.NewMovieRepository(Configuration.NewRepository(dbConn))
+	userRepo := users.NewUserRepository(Configuration.NewRepository(dbConn))
 
 	// Services
 	movieService := movies.NewService(movieRepo)
+	userService := users.NewUserService(userRepo)
 
 	// Endpoints
-	movies.RegisterRoutes(apiConnection, movieService)
+	movies.RegisterMovieRoutes(apiConnection, movieService)
+	users.RegisterUserRoutes(apiConnection, userService)
 
 	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {

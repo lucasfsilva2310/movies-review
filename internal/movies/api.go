@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(apiConnection *gin.Engine, service *Service) {
+func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	moviesURL := apiConnection.Group("/movies")
 
 	moviesURL.GET("/", func(ctx *gin.Context) {
