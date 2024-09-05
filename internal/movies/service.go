@@ -4,7 +4,7 @@ type MovieService struct {
 	movieRepository MovieRepository
 }
 
-func NewService(Repository *MovieRepository) *MovieService {
+func NewMovieService(Repository *MovieRepository) *MovieService {
 	return &MovieService{
 		movieRepository: *Repository,
 	}

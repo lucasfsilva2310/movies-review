@@ -6,6 +6,10 @@ CREATE TABLE IF NOT EXISTS ratings (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
+    --Foreign Keys
     FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+
+    --Constraints to have unique values for movie_id and user_id sequene
+     CONSTRAINT unique_movie_user UNIQUE (movie_id, user_id)
 );

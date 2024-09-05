@@ -11,6 +11,7 @@ import (
 
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
+	"github.com/lucasfsilva2310/movies-review/internal/ratings"
 	"github.com/lucasfsilva2310/movies-review/internal/users"
 	db "github.com/lucasfsilva2310/movies-review/pkg/database"
 )
@@ -45,14 +46,17 @@ func main() {
 	// Repositories
 	movieRepo := movies.NewMovieRepository(Configuration.NewRepository(dbConn))
 	userRepo := users.NewUserRepository(Configuration.NewRepository(dbConn))
+	ratingRepo := ratings.NewRatingRepository(Configuration.NewRepository(dbConn))
 
 	// Services
-	movieService := movies.NewService(movieRepo)
+	movieService := movies.NewMovieService(movieRepo)
 	userService := users.NewUserService(userRepo)
+	ratingService := ratings.NewRatingService(ratingRepo)
 
 	// Endpoints
 	movies.RegisterMovieRoutes(apiConnection, movieService)
 	users.RegisterUserRoutes(apiConnection, userService)
+	ratings.RegisterRatingRoutes(apiConnection, ratingService)
 
 	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {
