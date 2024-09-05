@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+	"github.com/lucasfsilva2310/movies-review/internal/errorHandlers"
 )
 
 type MovieRepository struct {
@@ -15,12 +16,6 @@ func NewMovieRepository(repo *Configuration.Repository) *MovieRepository {
 	return &MovieRepository{
 		Repo: repo,
 	}
-}
-
-type AlreadyExistsError struct{}
-
-func (alreadyExistsError *AlreadyExistsError) Error() string {
-	return "Movie Already Exists."
 }
 
 func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
@@ -59,31 +54,38 @@ func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
 	return movies, nil
 }
 
-func (movieRepo *MovieRepository) GetByID(id string) (Movie, error) {
-	var movie Movie
+func (movieRepo *MovieRepository) GetByID(id int) (MovieReturn, error) {
+	var movie MovieReturn
 
-	err := movieRepo.Repo.DB.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(
-		&movie.ID,
+	err := movieRepo.Repo.DB.QueryRow(`
+	SELECT
+		title,
+		description,
+		release_date,
+		tags,
+		platforms
+	FROM movies
+	WHERE id = $1`, id).Scan(
 		&movie.Title,
 		&movie.Description,
 		&movie.ReleaseDate,
 		&movie.Tags,
 		&movie.Platforms,
-		&movie.CreatedAt,
-		&movie.UpdatedAt,
 	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return Movie{}, nil
+			return MovieReturn{}, &errorHandlers.EntityNotFound{
+				Entity: "Movie",
+			}
 		}
-		return Movie{}, err
+		return MovieReturn{}, err
 	}
 
 	return movie, nil
 }
 
-func (movieRepo *MovieRepository) Create(movie Movie) error {
+func (movieRepo *MovieRepository) Create(movie MovieReturn) error {
 	var existingMovie Movie
 
 	err := movieRepo.Repo.DB.QueryRow("SELECT id FROM movies WHERE LOWER(title) = LOWER($1)", movie.Title).Scan(&existingMovie.ID)
@@ -92,8 +94,10 @@ func (movieRepo *MovieRepository) Create(movie Movie) error {
 		return err
 	}
 
-	if existingMovie.ID != "" {
-		return &AlreadyExistsError{}
+	if existingMovie.ID != 0 {
+		return &errorHandlers.AlreadyExistsError{
+			Entity: "Movie",
+		}
 	}
 
 	tagsJSON, err := json.Marshal(movie.Tags)
@@ -108,9 +112,9 @@ func (movieRepo *MovieRepository) Create(movie Movie) error {
 
 	_, err = movieRepo.Repo.DB.Exec(`
 		INSERT INTO movies
-	(title, description, release_date, tags, platforms, created_at, updated_at)
+	(title, description, release_date, tags, platforms)
 	  	VALUES 
-	($1, $2, $3, $4, $5, $6, $7)`, movie.Title, movie.Description, movie.ReleaseDate, tagsJSON, platformsJSON, movie.CreatedAt, movie.UpdatedAt)
+	($1, $2, $3, $4, $5)`, movie.Title, movie.Description, movie.ReleaseDate, tagsJSON, platformsJSON)
 
 	if err != nil {
 		return err
@@ -119,7 +123,7 @@ func (movieRepo *MovieRepository) Create(movie Movie) error {
 	return nil
 }
 
-func (movieRepo *MovieRepository) Delete(id string) error {
+func (movieRepo *MovieRepository) Delete(id int) error {
 	_, err := movieRepo.Repo.DB.Exec("DELETE FROM movies WHERE id = $1", id)
 	if err != nil {
 		return err

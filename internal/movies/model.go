@@ -28,7 +28,7 @@ const (
 )
 
 type Movie struct {
-	ID          string      `json:"id"`
+	ID          int         `json:"id"`
 	Title       string      `json:"title"`
 	Description string      `json:"description"`
 	ReleaseDate string      `json:"releaseDate"`
@@ -36,4 +36,12 @@ type Movie struct {
 	Platforms   []Platforms `json:"platforms"`
 	CreatedAt   time.Time   `json:"createdAt"`
 	UpdatedAt   time.Time   `json:"updatedAt"`
+}
+
+type MovieReturn struct {
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	ReleaseDate string      `json:"releaseDate"`
+	Tags        []Tags      `json:"tags"`
+	Platforms   []Platforms `json:"platforms"`
 }

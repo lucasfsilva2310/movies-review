@@ -2,6 +2,7 @@ package movies
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,11 +11,11 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	moviesURL := apiConnection.Group("/movies")
 
 	moviesURL.GET("/", func(ctx *gin.Context) {
-		movies, err := service.GetAll()
+		movies, errorRequesting := service.GetAll()
 
-		if err != nil {
+		if errorRequesting != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
+				"message": errorRequesting.Error(),
 			})
 			return
 		}
@@ -23,12 +24,19 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	})
 
 	moviesURL.GET("/:id", func(ctx *gin.Context) {
-		id := ctx.Param("id")
+		idParam := ctx.Param("id")
 
-		movie, err := service.GetByID(id)
+		id, errorConverting := strconv.Atoi(idParam)
 
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errorConverting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		movie, errorRequesting := service.GetByID(id)
+
+		if errorRequesting != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": errorRequesting.Error()})
 			return
 		}
 
@@ -36,17 +44,17 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	})
 
 	moviesURL.POST("/", func(ctx *gin.Context) {
-		var movie Movie
+		var movie MovieReturn
 
-		if err := ctx.ShouldBindJSON(&movie); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if errorBinding := ctx.ShouldBindJSON(&movie); errorBinding != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errorBinding.Error()})
 			return
 		}
 
-		err := service.Create(movie)
+		errorRequesting := service.Create(movie)
 
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errorRequesting != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": errorRequesting.Error()})
 			return
 		}
 
@@ -54,12 +62,19 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	})
 
 	moviesURL.DELETE("/:id", func(ctx *gin.Context) {
-		id := ctx.Param("id")
+		idParam := ctx.Param("id")
 
-		err := service.Delete(id)
+		id, errorConverting := strconv.Atoi(idParam)
 
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errorConverting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		errorRequesting := service.Delete(id)
+
+		if errorRequesting != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": errorRequesting.Error()})
 			return
 		}
 
