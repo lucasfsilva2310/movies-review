@@ -13,6 +13,7 @@ import (
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
 	"github.com/lucasfsilva2310/movies-review/internal/ratings"
 	"github.com/lucasfsilva2310/movies-review/internal/users"
+	"github.com/lucasfsilva2310/movies-review/internal/watchedMovies"
 	db "github.com/lucasfsilva2310/movies-review/pkg/database"
 )
 
@@ -47,16 +48,19 @@ func main() {
 	movieRepo := movies.NewMovieRepository(Configuration.NewRepository(dbConn))
 	userRepo := users.NewUserRepository(Configuration.NewRepository(dbConn))
 	ratingRepo := ratings.NewRatingRepository(Configuration.NewRepository(dbConn))
+	watchedMoviesRepo := watchedMovies.NewWatchedMovieRepository(Configuration.NewRepository(dbConn))
 
 	// Services
 	movieService := movies.NewMovieService(movieRepo)
 	userService := users.NewUserService(userRepo)
 	ratingService := ratings.NewRatingService(ratingRepo)
+	watchedMoviesService := watchedMovies.NewWatchedMovieService(watchedMoviesRepo)
 
 	// Endpoints
 	movies.RegisterMovieRoutes(apiConnection, movieService)
 	users.RegisterUserRoutes(apiConnection, userService)
 	ratings.RegisterRatingRoutes(apiConnection, ratingService)
+	watchedMovies.RegisterWatchedMoviesRoutes(apiConnection, watchedMoviesService)
 
 	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {
@@ -64,8 +68,6 @@ func main() {
 			"message": "Hello World",
 		})
 	})
-
-	// Movies
 
 	// Start API
 	apiConnection.Run(":" + PORT)
