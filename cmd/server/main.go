@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // Postgres Driver
 
+	movieComments "github.com/lucasfsilva2310/movies-review/internal/MovieComments"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
 	"github.com/lucasfsilva2310/movies-review/internal/ratings"
@@ -49,18 +50,21 @@ func main() {
 	userRepo := users.NewUserRepository(Configuration.NewRepository(dbConn))
 	ratingRepo := ratings.NewRatingRepository(Configuration.NewRepository(dbConn))
 	watchedMoviesRepo := watchedMovies.NewWatchedMovieRepository(Configuration.NewRepository(dbConn))
+	movieCommentsRepo := movieComments.NewMovieCommentRepository(Configuration.NewRepository(dbConn))
 
 	// Services
 	movieService := movies.NewMovieService(movieRepo)
 	userService := users.NewUserService(userRepo)
 	ratingService := ratings.NewRatingService(ratingRepo)
 	watchedMoviesService := watchedMovies.NewWatchedMovieService(watchedMoviesRepo)
+	movieCommentsService := movieComments.NewMovieCommentService(movieCommentsRepo)
 
 	// Endpoints
 	movies.RegisterMovieRoutes(apiConnection, movieService)
 	users.RegisterUserRoutes(apiConnection, userService)
 	ratings.RegisterRatingRoutes(apiConnection, ratingService)
 	watchedMovies.RegisterWatchedMoviesRoutes(apiConnection, watchedMoviesService)
+	movieComments.RegisterMovieCommentsRoutes(apiConnection, movieCommentsService)
 
 	// Health
 	apiConnection.GET("/hello", func(ctx *gin.Context) {
