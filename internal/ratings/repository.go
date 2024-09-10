@@ -88,3 +88,55 @@ func (ratingRepo *RatingRepository) GetAll() ([]RatingReturn, error) {
 	}
 	return ratings, nil
 }
+
+func (ratingRepo *RatingRepository) GetAllByMovieID(id int) ([]RatingReturn, error) {
+	var ratings []RatingReturn
+
+	rows, err := ratingRepo.Repo.DB.Query(`
+	SELECT
+	 score, 
+	 movie_id, 
+	 user_id 
+	FROM ratings
+		WHERE movie_id = $1
+	`, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var rating RatingReturn
+		if err := rows.Scan(&rating.Score, &rating.Movie_ID, &rating.User_ID); err != nil {
+			return nil, err
+		}
+		ratings = append(ratings, rating)
+	}
+	return ratings, nil
+}
+
+func (ratingRepo *RatingRepository) GetAllByUserID(id int) ([]RatingReturn, error) {
+	var ratings []RatingReturn
+
+	rows, err := ratingRepo.Repo.DB.Query(`
+	SELECT
+	 score, 
+	 movie_id, 
+	 user_id 
+	FROM ratings
+		WHERE user_id = $1
+	`, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var rating RatingReturn
+		if err := rows.Scan(&rating.Score, &rating.Movie_ID, &rating.User_ID); err != nil {
+			return nil, err
+		}
+		ratings = append(ratings, rating)
+	}
+	return ratings, nil
+}

@@ -17,3 +17,11 @@ func (service *RatingService) Create(rating Rating) error {
 func (service *RatingService) GetAll() ([]RatingReturn, error) {
 	return service.ratingRepository.GetAll()
 }
+
+func (service *RatingService) GetAllByMovieID(id int) ([]RatingReturn, error) {
+	return service.ratingRepository.GetAllByMovieID(id)
+}
+
+func (service *RatingService) GetAllByUserID(id int) ([]RatingReturn, error) {
+	return service.ratingRepository.GetAllByUserID(id)
+}

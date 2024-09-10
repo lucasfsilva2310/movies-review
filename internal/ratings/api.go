@@ -2,6 +2,7 @@ package ratings
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +29,7 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 	})
 
 	ratingsURL.GET("/", func(ctx *gin.Context) {
+
 		ratings, errorRequesting := service.GetAll()
 
 		if errorRequesting != nil {
@@ -39,4 +41,51 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 
 		ctx.JSON(http.StatusOK, ratings)
 	})
+
+	ratingsURL.GET("/movie/:id", func(ctx *gin.Context) {
+
+		idParam := ctx.Param("id")
+
+		id, errorConverting := strconv.Atoi(idParam)
+
+		if errorConverting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		ratings, errorRequesting := service.GetAllByMovieID(id)
+
+		if errorRequesting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": errorRequesting.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, ratings)
+	})
+
+	ratingsURL.GET("/user/:id", func(ctx *gin.Context) {
+
+		idParam := ctx.Param("id")
+
+		id, errorConverting := strconv.Atoi(idParam)
+
+		if errorConverting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		ratings, errorRequesting := service.GetAllByUserID(id)
+
+		if errorRequesting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": errorRequesting.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, ratings)
+	})
+
 }
