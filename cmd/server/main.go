@@ -9,8 +9,10 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // Postgres Driver
 
-	movieComments "github.com/lucasfsilva2310/movies-review/internal/MovieComments"
+	"github.com/lucasfsilva2310/movies-review/internal/auth"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
+	movieComments "github.com/lucasfsilva2310/movies-review/internal/movieComments"
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
 	"github.com/lucasfsilva2310/movies-review/internal/ratings"
 	"github.com/lucasfsilva2310/movies-review/internal/users"
@@ -51,6 +53,7 @@ func main() {
 	ratingRepo := ratings.NewRatingRepository(Configuration.NewRepository(dbConn))
 	watchedMoviesRepo := watchedMovies.NewWatchedMovieRepository(Configuration.NewRepository(dbConn))
 	movieCommentsRepo := movieComments.NewMovieCommentRepository(Configuration.NewRepository(dbConn))
+	authRepo := auth.NewAuthRepository(Configuration.NewRepository(dbConn))
 
 	// Services
 	movieService := movies.NewMovieService(movieRepo)
@@ -58,8 +61,14 @@ func main() {
 	ratingService := ratings.NewRatingService(ratingRepo)
 	watchedMoviesService := watchedMovies.NewWatchedMovieService(watchedMoviesRepo)
 	movieCommentsService := movieComments.NewMovieCommentService(movieCommentsRepo)
+	authService := auth.NewAuthService(authRepo, userRepo)
 
-	// Endpoints
+	// Public Endpoints
+	auth.RegisterAuthRoutes(apiConnection, authService)
+
+	apiConnection.Use(middlewares.AuthMiddleware())
+
+	// Protected Endpoints
 	movies.RegisterMovieRoutes(apiConnection, movieService)
 	users.RegisterUserRoutes(apiConnection, userService)
 	ratings.RegisterRatingRoutes(apiConnection, ratingService)
