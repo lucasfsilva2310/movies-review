@@ -25,3 +25,7 @@ func (service *RatingService) GetAllByMovieID(id int) ([]RatingReturn, error) {
 func (service *RatingService) GetAllByUserID(id int) ([]RatingReturn, error) {
 	return service.ratingRepository.GetAllByUserID(id)
 }
+
+func (service *RatingService) Delete(id int) error {
+	return service.ratingRepository.Delete(id)
+}

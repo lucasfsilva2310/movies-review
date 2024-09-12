@@ -88,4 +88,25 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 		ctx.JSON(http.StatusOK, ratings)
 	})
 
+	ratingsURL.DELETE("/:id", func(ctx *gin.Context) {
+
+		idParam := ctx.Param("id")
+
+		id, errorConverting := strconv.Atoi(idParam)
+
+		if errorConverting != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+			return
+		}
+
+		err := service.Delete(id)
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, nil)
+	})
+
 }

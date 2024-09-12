@@ -25,3 +25,7 @@ func (service *WatchedMovieService) GetAllByUserID(id int) ([]WatchedMovieReturn
 func (service *WatchedMovieService) GetAllByMovieID(id int) ([]WatchedMovieReturn, error) {
 	return service.watchedMovieRepository.GetAllByMovieID(id)
 }
+
+func (service *WatchedMovieService) Delete(id int) error {
+	return service.watchedMovieRepository.Delete(id)
+}

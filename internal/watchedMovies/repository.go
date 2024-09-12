@@ -120,3 +120,17 @@ func (watchedMovieRepo *WatchedMovieRepository) GetAllByMovieID(id int) ([]Watch
 
 	return watchedMovies, nil
 }
+
+func (watchedMovieRepo *WatchedMovieRepository) Delete(id int) error {
+	_, err := watchedMovieRepo.Repo.DB.Exec(
+		`
+		DELETE FROM watched_movies
+		WHERE id = $1
+		`,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}

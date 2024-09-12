@@ -140,3 +140,11 @@ func (ratingRepo *RatingRepository) GetAllByUserID(id int) ([]RatingReturn, erro
 	}
 	return ratings, nil
 }
+
+func (ratingRepo *RatingRepository) Delete(id int) error {
+	_, err := ratingRepo.Repo.DB.Exec("DELETE FROM ratings WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
