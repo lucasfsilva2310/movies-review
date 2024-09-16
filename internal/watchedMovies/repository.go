@@ -41,7 +41,6 @@ func (watchedMovieRepo *WatchedMovieRepository) GetAll() ([]WatchedMovieReturn, 
 			user_id,
 			watched
 		FROM watched_movies
-		WHERE active = true
 	`)
 	if err != nil {
 		return watchedMovies, err
@@ -72,7 +71,6 @@ func (watchedMovieRepo *WatchedMovieRepository) GetAllByUserID(id int) ([]Watche
 			watched
 		FROM watched_movies
 		WHERE user_id = $1
-		AND active = true
 	`, id)
 	if err != nil {
 		return watchedMovies, err
@@ -103,7 +101,6 @@ func (watchedMovieRepo *WatchedMovieRepository) GetAllByMovieID(id int) ([]Watch
 			watched
 		FROM watched_movies
 		WHERE movie_id = $1
-		AND active = true
 	`, id)
 	if err != nil {
 		return watchedMovies, err
