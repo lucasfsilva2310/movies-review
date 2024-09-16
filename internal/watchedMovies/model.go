@@ -7,6 +7,7 @@ type WatchedMovie struct {
 	Watched   bool `json:"watched"`
 	CreatedAt int  `json:"created_at"`
 	UpdatedAt int  `json:"updated_at"`
+	Active    bool `json:"active"`
 }
 
 type WatchedMovieReturn struct {

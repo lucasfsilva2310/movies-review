@@ -42,6 +42,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		ctx.Set("user", token.Claims)
 
 		ctx.Next()
 	}

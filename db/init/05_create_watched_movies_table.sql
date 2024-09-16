@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS watched_movies (
     watched BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    active BOOLEAN NOT NULL DEFAULT true
 
     --Foreign Keys
     FOREIGN KEY (movie_id) REFERENCES movies(id),

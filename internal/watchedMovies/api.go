@@ -79,7 +79,7 @@ func RegisterWatchedMoviesRoutes(apiConnection *gin.Engine, service *WatchedMovi
 		ctx.JSON(http.StatusOK, watchedMovies)
 	})
 
-	watchedMoviesURL.DELETE("/:id", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
+	watchedMoviesURL.DELETE("/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)
