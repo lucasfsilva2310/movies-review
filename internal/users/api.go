@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
 )
 
 func RegisterUserRoutes(apiConnection *gin.Engine, service *UserService) {
 	usersURL := apiConnection.Group("/users")
 
-	usersURL.POST("/", func(ctx *gin.Context) {
+	usersURL.POST("/", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		var user User
 
 		if err := ctx.ShouldBindJSON(&user); err != nil {
@@ -27,7 +28,7 @@ func RegisterUserRoutes(apiConnection *gin.Engine, service *UserService) {
 		ctx.JSON(http.StatusOK, nil)
 	})
 
-	usersURL.GET("/:id", func(ctx *gin.Context) {
+	usersURL.GET("/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		var user UserReturn
 
 		idParam := ctx.Param("id")
@@ -49,7 +50,7 @@ func RegisterUserRoutes(apiConnection *gin.Engine, service *UserService) {
 		ctx.JSON(http.StatusOK, user)
 	})
 
-	usersURL.GET("/username/:username", func(ctx *gin.Context) {
+	usersURL.GET("/username/:username", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		var user UserReturn
 
 		username := ctx.Param("username")
@@ -65,7 +66,7 @@ func RegisterUserRoutes(apiConnection *gin.Engine, service *UserService) {
 
 	})
 
-	usersURL.DELETE("/:id", func(ctx *gin.Context) {
+	usersURL.DELETE("/:id", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)
@@ -85,7 +86,7 @@ func RegisterUserRoutes(apiConnection *gin.Engine, service *UserService) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	})
 
-	usersURL.DELETE("/username/:username", func(ctx *gin.Context) {
+	usersURL.DELETE("/username/:username", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		username := ctx.Param("username")
 
 		errorRequesting := service.DeleteByUsername(username)

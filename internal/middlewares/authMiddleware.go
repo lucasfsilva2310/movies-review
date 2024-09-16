@@ -12,7 +12,9 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		secretKey := os.Getenv("SECRET_KEY")
 		authHeader := ctx.GetHeader("Authorization")
+
 		if authHeader == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
 			ctx.Abort()
@@ -22,13 +24,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization format"})
-			ctx.Abort()
-			return
-		}
-
-		secretKey := os.Getenv("SECRET_KEY")
-		if secretKey == "" {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Secret key not configured"})
 			ctx.Abort()
 			return
 		}

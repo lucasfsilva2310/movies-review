@@ -18,10 +18,10 @@ func NewMovieRepository(repo *Configuration.Repository) *MovieRepository {
 	}
 }
 
-func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
-	var movies []Movie
+func (movieRepo *MovieRepository) GetAll() ([]MovieReturn, error) {
+	var movies []MovieReturn
 
-	rows, err := movieRepo.Repo.DB.Query("SELECT * FROM movies")
+	rows, err := movieRepo.Repo.DB.Query("SELECT * FROM movies WHERE active = true")
 
 	if err != nil {
 		return nil, err
@@ -36,8 +36,8 @@ func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
 	}
 
 	for rows.Next() {
-		var movie Movie
-		if err := rows.Scan(&movie.ID, &movie.Title, &movie.Description, &movie.ReleaseDate, &tagsJSON, &platformsJSON, &movie.CreatedAt, &movie.UpdatedAt); err != nil {
+		var movie MovieReturn
+		if err := rows.Scan(&movie.Title, &movie.Description, &movie.ReleaseDate, &tagsJSON, &platformsJSON); err != nil {
 			return nil, err
 		}
 
@@ -57,6 +57,8 @@ func (movieRepo *MovieRepository) GetAll() ([]Movie, error) {
 func (movieRepo *MovieRepository) GetByID(id int) (MovieReturn, error) {
 	var movie MovieReturn
 
+	var tagsJSON, platformsJSON []byte
+
 	err := movieRepo.Repo.DB.QueryRow(`
 	SELECT
 		title,
@@ -65,12 +67,14 @@ func (movieRepo *MovieRepository) GetByID(id int) (MovieReturn, error) {
 		tags,
 		platforms
 	FROM movies
-	WHERE id = $1`, id).Scan(
+	WHERE id = $1
+	AND active = true
+	`, id).Scan(
 		&movie.Title,
 		&movie.Description,
 		&movie.ReleaseDate,
-		&movie.Tags,
-		&movie.Platforms,
+		&tagsJSON,
+		&platformsJSON,
 	)
 
 	if err != nil {
@@ -79,6 +83,14 @@ func (movieRepo *MovieRepository) GetByID(id int) (MovieReturn, error) {
 				Entity: "Movie",
 			}
 		}
+		return MovieReturn{}, err
+	}
+
+	if err := json.Unmarshal(tagsJSON, &movie.Tags); err != nil {
+		return MovieReturn{}, err
+	}
+
+	if err := json.Unmarshal(platformsJSON, &movie.Platforms); err != nil {
 		return MovieReturn{}, err
 	}
 
@@ -124,7 +136,7 @@ func (movieRepo *MovieRepository) Create(movie MovieReturn) error {
 }
 
 func (movieRepo *MovieRepository) Delete(id int) error {
-	_, err := movieRepo.Repo.DB.Exec("DELETE FROM movies WHERE id = $1", id)
+	_, err := movieRepo.Repo.DB.Exec("UPDATE movies SET active = false WHERE id = $1", id)
 	if err != nil {
 		return err
 	}

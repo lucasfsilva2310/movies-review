@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
 )
 
 func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 	moviesURL := apiConnection.Group("/movies")
 
-	moviesURL.GET("/", func(ctx *gin.Context) {
+	moviesURL.GET("/", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		movies, errorRequesting := service.GetAll()
 
 		if errorRequesting != nil {
@@ -23,7 +24,7 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 		ctx.JSON(http.StatusOK, movies)
 	})
 
-	moviesURL.GET("/:id", func(ctx *gin.Context) {
+	moviesURL.GET("/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)
@@ -43,7 +44,7 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 		ctx.JSON(http.StatusOK, movie)
 	})
 
-	moviesURL.POST("/", func(ctx *gin.Context) {
+	moviesURL.POST("/", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		var movie MovieReturn
 
 		if errorBinding := ctx.ShouldBindJSON(&movie); errorBinding != nil {
@@ -61,7 +62,7 @@ func RegisterMovieRoutes(apiConnection *gin.Engine, service *MovieService) {
 		ctx.JSON(http.StatusOK, movie)
 	})
 
-	moviesURL.DELETE("/:id", func(ctx *gin.Context) {
+	moviesURL.DELETE("/:id", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)

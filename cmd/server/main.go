@@ -11,7 +11,6 @@ import (
 
 	"github.com/lucasfsilva2310/movies-review/internal/auth"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
-	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
 	movieComments "github.com/lucasfsilva2310/movies-review/internal/movieComments"
 	"github.com/lucasfsilva2310/movies-review/internal/movies"
 	"github.com/lucasfsilva2310/movies-review/internal/ratings"
@@ -33,6 +32,12 @@ func main() {
 
 	PORT := config.Port
 	DATABASE_URL := config.DatabaseUrl
+	SECRET_KEY := config.SecretKey
+	ADMIN_KEY := config.AdminKey
+
+	if PORT == "" || DATABASE_URL == "" || SECRET_KEY == "" || ADMIN_KEY == "" {
+		log.Fatal("Environment variables not configured")
+	}
 
 	// Connect to DB
 	dbConn, err := db.ConnectDB(&Configuration.DatabaseConfig{
@@ -65,8 +70,6 @@ func main() {
 
 	// Public Endpoints
 	auth.RegisterAuthRoutes(apiConnection, authService)
-
-	apiConnection.Use(middlewares.AuthMiddleware())
 
 	// Protected Endpoints
 	movies.RegisterMovieRoutes(apiConnection, movieService)

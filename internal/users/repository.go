@@ -53,7 +53,9 @@ func (userRepo *UserRepository) GetById(id int) (UserReturn, error) {
 		full_name, 
 		email 
 	FROM users 
-	WHERE id = $1`, id).Scan(
+	WHERE id = $1
+	AND active = true
+	`, id).Scan(
 		&user.Username,
 		&user.FullName,
 		&user.Email,
@@ -80,7 +82,9 @@ func (userRepo *UserRepository) GetByUsername(username string) (UserReturn, erro
 		full_name, 
 		email 
 	FROM users 
-	WHERE username = $1`, username).Scan(
+	WHERE username = $1
+	AND active = true
+	`, username).Scan(
 		&user.Username,
 		&user.FullName,
 		&user.Email,
@@ -99,7 +103,7 @@ func (userRepo *UserRepository) GetByUsername(username string) (UserReturn, erro
 }
 
 func (userRepo *UserRepository) DeleteById(id int) error {
-	_, err := userRepo.Repo.DB.Exec("DELETE FROM users WHERE id = $1", id)
+	_, err := userRepo.Repo.DB.Exec("UPDATE users SET active = false WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -107,7 +111,7 @@ func (userRepo *UserRepository) DeleteById(id int) error {
 }
 
 func (userRepo *UserRepository) DeleteByUsername(username string) error {
-	_, err := userRepo.Repo.DB.Exec("DELETE FROM users WHERE username = $1", username)
+	_, err := userRepo.Repo.DB.Exec("UPDATE users SET active = false WHERE username = $1", username)
 	if err != nil {
 		return err
 	}

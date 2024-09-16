@@ -10,7 +10,7 @@ func NewMovieService(Repository *MovieRepository) *MovieService {
 	}
 }
 
-func (service *MovieService) GetAll() ([]Movie, error) {
+func (service *MovieService) GetAll() ([]MovieReturn, error) {
 	return service.movieRepository.GetAll()
 }
 

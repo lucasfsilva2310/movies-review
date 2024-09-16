@@ -120,3 +120,15 @@ func (movieCommentRepo *MovieCommentRepository) GetAllByMovieID(id int) ([]Movie
 
 	return movieComments, nil
 }
+
+func (movieCommentRepo *MovieCommentRepository) Delete(id int) error {
+	_, err := movieCommentRepo.Repo.DB.Exec(`
+		DELETE FROM movie_comments
+		WHERE id = $1
+	`, id)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

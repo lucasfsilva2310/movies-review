@@ -10,6 +10,8 @@ import (
 type Config struct {
 	DatabaseUrl string
 	Port        string
+	SecretKey   string
+	AdminKey    string
 }
 
 type DatabaseConfig struct {
@@ -30,6 +32,8 @@ func LoadEnvConfig() *Config {
 	return &Config{
 		DatabaseUrl: os.Getenv("DATABASE_URL"),
 		Port:        os.Getenv("PORT"),
+		SecretKey:   os.Getenv("SECRET_KEY"),
+		AdminKey:    os.Getenv("ADMIN_KEY"),
 	}
 }
 

@@ -36,6 +36,7 @@ type Movie struct {
 	Platforms   []Platforms `json:"platforms"`
 	CreatedAt   time.Time   `json:"createdAt"`
 	UpdatedAt   time.Time   `json:"updatedAt"`
+	Active      bool        `json:"active"`
 }
 
 type MovieReturn struct {

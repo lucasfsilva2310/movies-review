@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
 )
 
 func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 	ratingsURL := apiConnection.Group("/ratings")
 
-	ratingsURL.POST("/", func(ctx *gin.Context) {
+	ratingsURL.POST("/", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		var rating Rating
 
 		if err := ctx.ShouldBindJSON(&rating); err != nil {
@@ -28,7 +29,7 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 		ctx.JSON(http.StatusOK, nil)
 	})
 
-	ratingsURL.GET("/", func(ctx *gin.Context) {
+	ratingsURL.GET("/", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 
 		ratings, errorRequesting := service.GetAll()
 
@@ -42,7 +43,7 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 		ctx.JSON(http.StatusOK, ratings)
 	})
 
-	ratingsURL.GET("/movie/:id", func(ctx *gin.Context) {
+	ratingsURL.GET("/movie/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 
 		idParam := ctx.Param("id")
 
@@ -65,7 +66,7 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 		ctx.JSON(http.StatusOK, ratings)
 	})
 
-	ratingsURL.GET("/user/:id", func(ctx *gin.Context) {
+	ratingsURL.GET("/user/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 
 		idParam := ctx.Param("id")
 
@@ -88,7 +89,7 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 		ctx.JSON(http.StatusOK, ratings)
 	})
 
-	ratingsURL.DELETE("/:id", func(ctx *gin.Context) {
+	ratingsURL.DELETE("/:id", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 
 		idParam := ctx.Param("id")
 

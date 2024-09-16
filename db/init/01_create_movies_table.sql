@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS movies (
     tags JSONB  NOT NULL,
     platforms JSONB  NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    active BOOLEAN NOT NULL DEFAULT true
 );

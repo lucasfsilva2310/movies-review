@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
 )
 
 func RegisterMovieCommentsRoutes(apiConnection *gin.Engine, service *MovieCommentService) {
 	movieCommentsURL := apiConnection.Group("/movie-comments")
 
-	movieCommentsURL.POST("/", func(ctx *gin.Context) {
+	movieCommentsURL.POST("/", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		var movieComment MovieComment
 
 		if err := ctx.ShouldBindJSON(&movieComment); err != nil {
@@ -27,7 +28,7 @@ func RegisterMovieCommentsRoutes(apiConnection *gin.Engine, service *MovieCommen
 		ctx.JSON(http.StatusOK, nil)
 	})
 
-	movieCommentsURL.GET("/", func(ctx *gin.Context) {
+	movieCommentsURL.GET("/", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		movieComments, err := service.GetAll()
 
 		if err != nil {
@@ -38,7 +39,7 @@ func RegisterMovieCommentsRoutes(apiConnection *gin.Engine, service *MovieCommen
 		ctx.JSON(http.StatusOK, movieComments)
 	})
 
-	movieCommentsURL.GET("/user/:id", func(ctx *gin.Context) {
+	movieCommentsURL.GET("/user/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)
@@ -58,7 +59,7 @@ func RegisterMovieCommentsRoutes(apiConnection *gin.Engine, service *MovieCommen
 		ctx.JSON(http.StatusOK, movieComments)
 	})
 
-	movieCommentsURL.GET("/movie/:id", func(ctx *gin.Context) {
+	movieCommentsURL.GET("/movie/:id", middlewares.AuthMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)
@@ -78,7 +79,7 @@ func RegisterMovieCommentsRoutes(apiConnection *gin.Engine, service *MovieCommen
 		ctx.JSON(http.StatusOK, movieComments)
 	})
 
-	movieCommentsURL.DELETE("/:id", func(ctx *gin.Context) {
+	movieCommentsURL.DELETE("/:id", middlewares.AdminMiddleware(), func(ctx *gin.Context) {
 		idParam := ctx.Param("id")
 
 		id, errorConverting := strconv.Atoi(idParam)

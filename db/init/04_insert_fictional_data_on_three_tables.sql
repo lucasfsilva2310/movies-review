@@ -10,10 +10,10 @@ VALUES
 -- Inserting data on users
 INSERT INTO users (username, password, full_name, email)
 VALUES
-('john_doe', 'password123', 'John Doe', 'john@example.com'),
-('jane_smith', 'password123', 'Jane Smith', 'jane@example.com'),
-('alice_wonder', 'password123', 'Alice Wonder', 'alice@example.com'),
-('bob_builder', 'password123', 'Bob Builder', 'bob@example.com'),
+('john_doe', '$2a$10$47dAe7Vodpmou/XWjiJC0.xrYrOMfl7ck10lajLkbkdgJsp898lwW', 'John Doe', 'john@example.com'),
+('jane_smith', '$2a$10$47dAe7Vodpmou/XWjiJC0.xrYrOMfl7ck10lajLkbkdgJsp898lwW', 'Jane Smith', 'jane@example.com'),
+('alice_wonder', '$2a$10$47dAe7Vodpmou/XWjiJC0.xrYrOMfl7ck10lajLkbkdgJsp898lwW', 'Alice Wonder', 'alice@example.com'),
+('bob_builder', '$2a$10$47dAe7Vodpmou/XWjiJC0.xrYrOMfl7ck10lajLkbkdgJsp898lwW', 'Bob Builder', 'bob@example.com'),
 ('charlie_brown', 'password123', 'Charlie Brown', 'charlie@example.com');
 
 -- Inserting data on ratings

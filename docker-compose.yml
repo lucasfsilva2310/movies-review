@@ -24,6 +24,7 @@ services:
       DATABASE_URL: postgres://myuser:mypassword@movies_review_postgres_database:5432/mydb?sslmode=disable
       PORT: 8000
       SECRET_KEY: mysecretkey
+      ADMIN_KEY: myadminkey
       LOAD_ENV_FILE: false
     depends_on:
       - movies_review_postgres_database
