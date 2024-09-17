@@ -26,6 +26,10 @@ func (service *MovieCommentService) GetAllByMovieID(id int) ([]MovieCommentRetur
 	return service.movieCommentRepository.GetAllByMovieID(id)
 }
 
+func (service *MovieCommentService) UpdateMovieComment(id int, username string, movieComment MovieCommentUpdate) error {
+	return service.movieCommentRepository.Update(id, username, movieComment)
+}
+
 func (service *MovieCommentService) Delete(id int) error {
 	return service.movieCommentRepository.Delete(id)
 }

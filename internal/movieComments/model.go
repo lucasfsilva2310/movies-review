@@ -14,3 +14,7 @@ type MovieCommentReturn struct {
 	User_ID  int    `json:"user_id"`
 	Movie_ID int    `json:"movie_id"`
 }
+
+type MovieCommentUpdate struct {
+	Comment string `json:"comment"`
+}

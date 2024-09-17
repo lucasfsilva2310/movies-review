@@ -1,6 +1,11 @@
 package movieComments
 
-import Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+import (
+	"database/sql"
+
+	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+	"github.com/lucasfsilva2310/movies-review/internal/errorHandlers"
+)
 
 type MovieCommentRepository struct {
 	Repo *Configuration.Repository
@@ -119,6 +124,49 @@ func (movieCommentRepo *MovieCommentRepository) GetAllByMovieID(id int) ([]Movie
 	}
 
 	return movieComments, nil
+}
+
+func (movieCommentRepo *MovieCommentRepository) Update(id int, username string, movieComment MovieCommentUpdate) error {
+	var dbMovieComment = struct {
+		ID       int
+		User_ID  int
+		Username string
+	}{}
+
+	err := movieCommentRepo.Repo.DB.QueryRow(`
+	SELECT
+		movie_comments.id,
+		user_id,
+		users.username
+	FROM movie_comments
+	JOIN users on users.id = movie_comments.user_id
+	WHERE movie_comments.id = $1
+	`, id).Scan(&dbMovieComment.ID, &dbMovieComment.User_ID, &dbMovieComment.Username)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "MovieComment",
+			}
+		}
+		return err
+	}
+
+	if dbMovieComment.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
+	_, err = movieCommentRepo.Repo.DB.Exec(`
+		UPDATE movie_comments
+		SET comment = $1 
+		WHERE id = $2
+	`, movieComment.Comment, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (movieCommentRepo *MovieCommentRepository) Delete(id int) error {
