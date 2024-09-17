@@ -42,7 +42,15 @@ func AuthMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		ctx.Set("user", token.Claims)
+
+		// Asserting type to claims
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			ctx.Set("user", claims)
+		} else {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			ctx.Abort()
+			return
+		}
 
 		ctx.Next()
 	}
