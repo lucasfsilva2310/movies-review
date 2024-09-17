@@ -1,6 +1,8 @@
 package ratings
 
 import (
+	"database/sql"
+
 	"github.com/lib/pq"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
 	"github.com/lucasfsilva2310/movies-review/internal/errorHandlers"
@@ -139,6 +141,49 @@ func (ratingRepo *RatingRepository) GetAllByUserID(id int) ([]RatingReturn, erro
 		ratings = append(ratings, rating)
 	}
 	return ratings, nil
+}
+
+func (ratingRepo *RatingRepository) Update(id int, username string, rating RatingUpdate) error {
+	var dbRating = struct {
+		ID       int
+		User_ID  int
+		Username string
+	}{}
+
+	err := ratingRepo.Repo.DB.QueryRow(`
+	SELECT
+		ratings.id,
+		user_id,
+		users.username
+	FROM ratings
+	JOIN users on users.id = ratings.user_id
+	WHERE ratings.id = $1
+	`, id).Scan(&dbRating.ID, &dbRating.User_ID, &dbRating.Username)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "rating",
+			}
+		}
+		return err
+	}
+
+	if dbRating.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
+	_, err = ratingRepo.Repo.DB.Exec(`
+		UPDATE ratings
+		SET score = $1 
+		WHERE id = $2
+	`, rating.Score, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ratingRepo *RatingRepository) Delete(id int) error {

@@ -26,6 +26,10 @@ func (service *RatingService) GetAllByUserID(id int) ([]RatingReturn, error) {
 	return service.ratingRepository.GetAllByUserID(id)
 }
 
+func (service *RatingService) UpdateRating(id int, username string, rating RatingUpdate) error {
+	return service.ratingRepository.Update(id, username, rating)
+}
+
 func (service *RatingService) Delete(id int) error {
 	return service.ratingRepository.Delete(id)
 }

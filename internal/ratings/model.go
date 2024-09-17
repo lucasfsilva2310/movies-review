@@ -14,3 +14,7 @@ type RatingReturn struct {
 	Movie_ID int `json:"movie_id"`
 	User_ID  int `json:"user_id"`
 }
+
+type RatingUpdate struct {
+	Score int `json:"score"`
+}
