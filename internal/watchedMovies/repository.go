@@ -1,6 +1,11 @@
 package watchedMovies
 
-import Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+import (
+	"database/sql"
+
+	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
+	"github.com/lucasfsilva2310/movies-review/internal/errorHandlers"
+)
 
 type WatchedMovieRepository struct {
 	Repo *Configuration.Repository
@@ -119,6 +124,51 @@ func (watchedMovieRepo *WatchedMovieRepository) GetAllByMovieID(id int) ([]Watch
 	}
 
 	return watchedMovies, nil
+}
+
+func (watchedMovieRepo *WatchedMovieRepository) Update(id int, username string) error {
+	var dbWatchedMovie = struct {
+		ID       int
+		watched  bool
+		User_ID  int
+		Username string
+	}{}
+
+	err := watchedMovieRepo.Repo.DB.QueryRow(`
+	SELECT
+		watched_movies.id,
+		watched,
+		user_id,
+		users.username
+	FROM watched_movies
+	JOIN users on users.id = watched_movies.user_id
+	WHERE watched_movies.id = $1
+	`, id).Scan(&dbWatchedMovie.ID, &dbWatchedMovie.watched, &dbWatchedMovie.User_ID, &dbWatchedMovie.Username)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "WatchedMovie",
+			}
+		}
+		return err
+	}
+
+	if dbWatchedMovie.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
+	_, err = watchedMovieRepo.Repo.DB.Exec(`
+		UPDATE watched_movies
+		SET watched = $1 
+		WHERE id = $2
+	`, !dbWatchedMovie.watched, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (watchedMovieRepo *WatchedMovieRepository) Delete(id int) error {
