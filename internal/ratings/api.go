@@ -132,7 +132,13 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 			return
 		}
 
-		err := service.Delete(id)
+		username, errorUsername := utils.GetUsernameFromContext(ctx)
+
+		if errorUsername != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errorUsername.Error()})
+		}
+
+		err := service.Delete(id, username)
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

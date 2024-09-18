@@ -171,7 +171,38 @@ func (watchedMovieRepo *WatchedMovieRepository) Update(id int, username string) 
 	return nil
 }
 
-func (watchedMovieRepo *WatchedMovieRepository) Delete(id int) error {
+func (watchedMovieRepo *WatchedMovieRepository) Delete(id int, username string) error {
+	var dbWatchedMovie = struct {
+		ID       int
+		watched  bool
+		User_ID  int
+		Username string
+	}{}
+
+	errorScanning := watchedMovieRepo.Repo.DB.QueryRow(`
+	SELECT
+		watched_movies.id,
+		watched,
+		user_id,
+		users.username
+	FROM watched_movies
+	JOIN users on users.id = watched_movies.user_id
+	WHERE watched_movies.id = $1
+	`, id).Scan(&dbWatchedMovie.ID, &dbWatchedMovie.watched, &dbWatchedMovie.User_ID, &dbWatchedMovie.Username)
+
+	if errorScanning != nil {
+		if errorScanning == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "WatchedMovie",
+			}
+		}
+		return errorScanning
+	}
+
+	if dbWatchedMovie.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
 	_, err := watchedMovieRepo.Repo.DB.Exec(
 		`
 		DELETE FROM watched_movies

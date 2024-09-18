@@ -30,6 +30,6 @@ func (service *RatingService) UpdateRating(id int, username string, rating Ratin
 	return service.ratingRepository.Update(id, username, rating)
 }
 
-func (service *RatingService) Delete(id int) error {
-	return service.ratingRepository.Delete(id)
+func (service *RatingService) Delete(id int, username string) error {
+	return service.ratingRepository.Delete(id, username)
 }

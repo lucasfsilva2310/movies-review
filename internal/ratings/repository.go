@@ -2,7 +2,6 @@ package ratings
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/lib/pq"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
@@ -173,24 +172,50 @@ func (ratingRepo *RatingRepository) Update(id int, username string, rating Ratin
 	if dbRating.Username != username {
 		return &errorHandlers.NotSameUser{}
 	}
-	fmt.Println(rating.Score, id)
+
 	_, err = ratingRepo.Repo.DB.Exec(`
 		UPDATE ratings
 		SET score = $1 
 		WHERE id = $2
 	`, rating.Score, id)
-	fmt.Println("depois")
 
 	if err != nil {
-		fmt.Println("aqui")
-
 		return err
 	}
 
 	return nil
 }
 
-func (ratingRepo *RatingRepository) Delete(id int) error {
+func (ratingRepo *RatingRepository) Delete(id int, username string) error {
+	var dbRating = struct {
+		ID       int
+		User_ID  int
+		Username string
+	}{}
+
+	errScanning := ratingRepo.Repo.DB.QueryRow(`
+	SELECT
+		ratings.id,
+		user_id,
+		users.username
+	FROM ratings
+	JOIN users on users.id = ratings.user_id
+	WHERE ratings.id = $1
+	`, id).Scan(&dbRating.ID, &dbRating.User_ID, &dbRating.Username)
+
+	if errScanning != nil {
+		if errScanning == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "rating",
+			}
+		}
+		return errScanning
+	}
+
+	if dbRating.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
 	_, err := ratingRepo.Repo.DB.Exec("DELETE FROM ratings WHERE id = $1", id)
 	if err != nil {
 		return err

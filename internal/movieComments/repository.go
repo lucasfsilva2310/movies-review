@@ -169,7 +169,36 @@ func (movieCommentRepo *MovieCommentRepository) Update(id int, username string, 
 	return nil
 }
 
-func (movieCommentRepo *MovieCommentRepository) Delete(id int) error {
+func (movieCommentRepo *MovieCommentRepository) Delete(id int, username string) error {
+	var dbMovieComment = struct {
+		ID       int
+		User_ID  int
+		Username string
+	}{}
+
+	errorScanning := movieCommentRepo.Repo.DB.QueryRow(`
+	SELECT
+		movie_comments.id,
+		user_id,
+		users.username
+	FROM movie_comments
+	JOIN users on users.id = movie_comments.user_id
+	WHERE movie_comments.id = $1
+	`, id).Scan(&dbMovieComment.ID, &dbMovieComment.User_ID, &dbMovieComment.Username)
+
+	if errorScanning != nil {
+		if errorScanning == sql.ErrNoRows {
+			return &errorHandlers.EntityNotFound{
+				Entity: "MovieComment",
+			}
+		}
+		return errorScanning
+	}
+
+	if dbMovieComment.Username != username {
+		return &errorHandlers.NotSameUser{}
+	}
+
 	_, err := movieCommentRepo.Repo.DB.Exec(`
 		DELETE FROM movie_comments
 		WHERE id = $1

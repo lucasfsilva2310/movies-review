@@ -30,6 +30,6 @@ func (service *WatchedMovieService) UpdateWatchedMovie(id int, username string) 
 	return service.watchedMovieRepository.Update(id, username)
 }
 
-func (service *WatchedMovieService) Delete(id int) error {
-	return service.watchedMovieRepository.Delete(id)
+func (service *WatchedMovieService) Delete(id int, username string) error {
+	return service.watchedMovieRepository.Delete(id, username)
 }

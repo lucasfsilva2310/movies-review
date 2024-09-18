@@ -30,6 +30,6 @@ func (service *MovieCommentService) UpdateMovieComment(id int, username string, 
 	return service.movieCommentRepository.Update(id, username, movieComment)
 }
 
-func (service *MovieCommentService) Delete(id int) error {
-	return service.movieCommentRepository.Delete(id)
+func (service *MovieCommentService) Delete(id int, username string) error {
+	return service.movieCommentRepository.Delete(id, username)
 }
