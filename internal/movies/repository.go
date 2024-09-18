@@ -21,7 +21,16 @@ func NewMovieRepository(repo *Configuration.Repository) *MovieRepository {
 func (movieRepo *MovieRepository) GetAll() ([]MovieReturn, error) {
 	var movies []MovieReturn
 
-	rows, err := movieRepo.Repo.DB.Query("SELECT * FROM movies WHERE active = true")
+	rows, err := movieRepo.Repo.DB.Query(`
+	SELECT 
+		title,
+		description,
+		release_date,
+		tags,
+		platforms
+	FROM movies 
+	WHERE 
+		active = true`)
 
 	if err != nil {
 		return nil, err

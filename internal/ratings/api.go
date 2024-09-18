@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/lucasfsilva2310/movies-review/internal/middlewares"
+	"github.com/lucasfsilva2310/movies-review/internal/utils"
 )
 
 func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
@@ -105,18 +105,11 @@ func RegisterRatingRoutes(apiConnection *gin.Engine, service *RatingService) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Body"})
 		}
 
-		user, exists := ctx.Get("user")
-		if !exists {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "User not found in token"})
-		}
+		username, errorUsername := utils.GetUsernameFromContext(ctx)
 
-		userMap, ok := user.(jwt.MapClaims)
-		if !ok {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid token data"})
-			return
+		if errorUsername != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": errorUsername.Error()})
 		}
-
-		username, _ := userMap["username"].(string)
 
 		err := service.UpdateRating(id, username, rating)
 

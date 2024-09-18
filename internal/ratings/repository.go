@@ -2,6 +2,7 @@ package ratings
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/lib/pq"
 	Configuration "github.com/lucasfsilva2310/movies-review/internal/config"
@@ -172,14 +173,17 @@ func (ratingRepo *RatingRepository) Update(id int, username string, rating Ratin
 	if dbRating.Username != username {
 		return &errorHandlers.NotSameUser{}
 	}
-
+	fmt.Println(rating.Score, id)
 	_, err = ratingRepo.Repo.DB.Exec(`
 		UPDATE ratings
 		SET score = $1 
 		WHERE id = $2
 	`, rating.Score, id)
+	fmt.Println("depois")
 
 	if err != nil {
+		fmt.Println("aqui")
+
 		return err
 	}
 
