@@ -1,11 +1,13 @@
-import './App.css'
+import Example from './components/example/example'
+import './index.css'
 
 function App() {
 
   return (
     <>
-      <h1>Hello World</h1>
-        
+      <main className='bg-slate-500 w-screen h-screen '>
+        <Example/>
+      </main>
       
     </>
   )
