@@ -35,6 +35,27 @@ services:
     ports:
       - "8000:8000"
 
+  movies_review_web:
+    image: node:20
+    container_name: movies_review_web
+    working_dir: /app/web
+    environment:
+      NODE_ENV: development
+    build:
+      context: ./web
+    depends_on:
+      - movies_review_postgres_database
+      - movies_review_api
+    volumes:
+      - ./web:/app/web
+      - /app/web/node_modules
+    networks:
+      - movies-review-network
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npm install && npm run dev  -- --host"
+
 volumes:
   postgres_data:
 

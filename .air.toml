@@ -8,10 +8,12 @@ main = "cmd/server/main.go"
 exclude = [
     "tmp/*",
     "client/*",
+    "web/*",
 ] # Specifies the directories to be excluded from monitoring for changes
 include = [
     "**/*.go",
 ] # Specifies the file patterns to be included for monitoring.
 ignore = [
     "tmp/*",
+    "web/*",
 ] # Specifies the files or directories to be ignored when triggering a build.
