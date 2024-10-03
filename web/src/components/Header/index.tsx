@@ -8,7 +8,7 @@ export default function Header() {
             >
                 <div className="flex lg:flex-1">
                     <a
-                        href="#"
+                        href="/"
                         className="-m-1.5 p-1.5"
                     >
                         <img
@@ -16,6 +16,15 @@ export default function Header() {
                             src="https://cdn1.thepopcornfactory.com/wcsstore/ThePopcornFactory/images/catalog/tpf_85254x.jpg"
                             className={`h-8 w-auto`}
                         />
+                    </a>
+                </div>
+
+                <div className="flex">
+                    <a
+                        href="/movies"
+                        className={`rounded-md bg-slate-700 p-2 text-sm font-semibold leading-6 text-gray-900 hover:bg-slate-800`}
+                    >
+                        Movies{' '}
                     </a>
                 </div>
 
