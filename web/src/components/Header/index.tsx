@@ -1,20 +1,20 @@
 'use client';
 export default function Header() {
     return (
-        <header className="bg-slate-600">
+        <header className="w-full h-20 bg-slate-500">
             <nav
                 aria-label="Global"
-                className={`mx-auto flex max-w-full items-center justify-between bg-slate-600 p-6 lg:px-8`}
+                className={`flex items-center h-full justify-between bg-slate-600 p-2`}
             >
                 <div className="flex lg:flex-1">
                     <a
                         href="/"
-                        className="-m-1.5 p-1.5"
+                        className="h-16 w-16 object-contain"
                     >
                         <img
                             alt=""
                             src="https://cdn1.thepopcornfactory.com/wcsstore/ThePopcornFactory/images/catalog/tpf_85254x.jpg"
-                            className={`h-8 w-auto`}
+                            className={`h-full w-full`}
                         />
                     </a>
                 </div>
@@ -22,7 +22,7 @@ export default function Header() {
                 <div className="flex">
                     <a
                         href="/movies"
-                        className={`rounded-md bg-slate-700 p-2 text-sm font-semibold leading-6 text-gray-900 hover:bg-slate-800`}
+                        className={`rounded-md bg-slate-700 p-2 text-sm font-semibold  text-gray-900 hover:bg-slate-800`}
                     >
                         Movies{' '}
                     </a>
@@ -31,7 +31,7 @@ export default function Header() {
                 <div className="lg:flex lg:flex-1 lg:justify-end">
                     <a
                         href="#"
-                        className={`rounded-md bg-slate-700 p-2 text-sm font-semibold leading-6 text-gray-900 hover:bg-slate-800`}
+                        className={`rounded-md bg-slate-700 p-2 text-sm font-semibold  text-gray-900 transition ease-in-ou hover:bg-slate-800`}
                     >
                         Log in{' '}
                         <span aria-hidden="true">
