@@ -36,7 +36,7 @@ export const SignUp = () => {
                         </div>
 
                         <div>
-                            <button type='submit'>Sign up</button>
+                            <button className="bg-slate-300 p-3 rounded-md" type='submit'>Sign up</button>
                         </div>
                     </form>
                 </div>
