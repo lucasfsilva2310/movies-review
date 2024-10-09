@@ -1,18 +1,21 @@
+import { RouterProvider } from 'react-router-dom';
 import Header from './components/Header';
-import { SignUp } from './components/SignUp'
 import './index.css'
+import { router } from './routes';
 
-function App() {
+export const App = () => {
 
   return (
     <>
       <main className='bg-slate-500 w-screen h-screen'>
+        <div className='w-full h-[10vh]'>
         <Header/>
-        <SignUp/>
+        </div>
+        <div className='w-full h-[90vh]'>
+        <RouterProvider router={router}/>        
+        </div>
       </main>
       
     </>
   )
 }
-
-export default App

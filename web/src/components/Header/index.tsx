@@ -1,7 +1,7 @@
 'use client';
 export default function Header() {
     return (
-        <header className="w-full h-20 bg-slate-500">
+        <header className="bg-slate-500">
             <nav
                 aria-label="Global"
                 className={`flex items-center h-full justify-between bg-slate-600 p-2`}
