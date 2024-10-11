@@ -12,7 +12,7 @@ export const App = () => {
         <Header/>
         </div>
         <div className='w-full h-[90vh]'>
-        <RouterProvider router={router}/>        
+        <RouterProvider router={router} fallbackElement={<div>Loading...</div>} />        
         </div>
       </main>
       
